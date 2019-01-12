@@ -1,7 +1,5 @@
 # rogue-tutorial
 
-my results after doing the libtcod python 3 roguelike tutorial
-
 Howdy! This is my code as of the end of the libtcod python 3 roguelike tutorial found here: http://rogueliketutorials.com/libtcod/1
 I plan to expand the results of this tutorial into a slightly larger game. 
 My problem is this: after completing it, I discovered that the inventory menu would not show up when "I" is pressed.
