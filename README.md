@@ -1,9 +1,20 @@
 # rogue-tutorial
 
-Howdy! This is my code as of the end of the libtcod python 3 roguelike tutorial found here: http://rogueliketutorials.com/libtcod/1
-I plan to expand the results of this tutorial into a slightly larger game. 
-My problem is this: after completing it, I discovered that the inventory menu would not show up when "I" is pressed.
-When "I" is pressed, the menu itself does not appear on screen, but input reacts as though it is on screen: pressing "A" will cause
-you to unequip your dagger, B will let you drink the poition assigned to the B slot, etc.
-However, the menu *does* show up when "D" is pressed, the key for dropping things from the inventory.
-This issue only started happening at the end of part 13 of the tutorial; it worked fine before then. Halp?
+Howdy! This is my code after finishing and expanding upon the libtcod python 3 roguelike tutorial found here: http://rogueliketutorials.com/libtcod/1
+
+Some differences from the original tutorial are:
+  -a slightly different control scheme (backspace to exit game, esc to exit a menu, numpad controls)
+  -added CROSSBOWS (the feature i am most proud of)
+  -revamped old enemies and added other, wackier enemies:
+      -goblins, orcs trolls, and dark knights follow standard enemy behavior and are identical apart from their stats (each tougher than the previous)
+      -special goblin that moves fast
+      -fairies which die in one hit but cannot be killed with the crossbow (GASP) and have a high damage attack
+      -kobold with a higher melee range than most enemies (two blocks, not one)
+      -lord of evil (boss) who has three different attacks (standard melee, melee fire magic, ranged scream attack)
+  -win condition: kill the lord of evil on floor 11 to win
+  -defense now has a degree of randomness to it
+  -lightning scroll now affected by defense (but fireball scroll is not)
+  -main menu background (file named (menu_background) replaced with ~~a paint.net doodle~~ a beautiful 4k ultra HD artwork of my own design (look at that REALISM)
+  -removed herobrine
+  
+It's no Witcher 3, but I think I did alright.
