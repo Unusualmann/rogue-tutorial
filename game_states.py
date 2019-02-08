@@ -10,3 +10,5 @@ class GameStates(Enum):
     TARGETING = 6
     LEVEL_UP = 7
     CHARACTER_SCREEN = 8
+    AIMING = 9
+    VICTORY = 10

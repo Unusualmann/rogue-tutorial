@@ -1,5 +1,5 @@
 import libtcodpy as libtcod
-
+import config
 from death_functions import kill_monster, kill_player
 from entity import get_blocking_entities_at_location
 from fov_functions import initialize_fov, recompute_fov
@@ -75,6 +75,7 @@ def main():
 
             show_main_menu = True
 
+
 def play_game(player, entities, game_map, message_log, game_state, con, panel, constants):
     fov_recompute = True
 
@@ -109,6 +110,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         mouse_action = handle_mouse(mouse)
 
         move = action.get('move')
+        aim_weapon = action.get('aim_weapon')
         wait = action.get('wait')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
@@ -138,15 +140,29 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     player.move(dx, dy)
 
                     fov_recompute = True
-                elif target:
-                    attack_results = player.fighter.attack(target)
-                    player_turn_results.extend(attack_results)
+                elif target:  # ATTACK!
+
+                    if player.equipment.power_bonus == 4:
+                        attack_results = player.fighter.basic_bow_attack(target)
+                        player_turn_results.extend(attack_results)
+
+                    else:
+                        attack_results = player.fighter.attack(target)
+                        player_turn_results.extend(attack_results)
+
                 else:
                     player.move(dx, dy)
 
                     fov_recompute = True
 
                 game_state = GameStates.ENEMY_TURN
+
+        elif aim_weapon and game_state == GameStates.PLAYERS_TURN:  # ALSO ATTACK! Working on this at the moment
+            if player.equipment.power_bonus == 4 and game_state == GameStates.PLAYERS_TURN:
+                message_log.add_message(Message('Left click a tile to fire at it or right click to cancel!', libtcod.yellow))
+                game_state = GameStates.AIMING
+            else:
+                message_log.add_message(Message('You do not have a ranged weapon equipped!', libtcod.yellow))
 
         elif wait:
             game_state = GameStates.ENEMY_TURN
@@ -215,6 +231,16 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             elif right_click:
                 player_turn_results.append({'targeting_cancelled': True})
 
+        if game_state == GameStates.AIMING:
+            if left_click:
+                target_x, target_y = left_click
+                coordinates = target_x, target_y  # OKAY NOW WHAT THE FUCK I DONT UNDESTAND WHY THIS WORKS OR HOW THE
+                # VARIABLES GET FROM HERE TO THE FUNCTION I NEED THEM I MEAN JESUS CHRIST I JUST WOUND UP WITH THIS
+                # ARRANGEMENT BY FUCKING AROUND I MEAN IT WORKS BUT SERIOUSLY I DONT UNDERSTAND WHY THIS WORKS
+                player_turn_results.append({'fire_weapon': True})
+            elif right_click:
+                player_turn_results.append({'targeting_cancelled': True})
+
         if exit_menu:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY, GameStates.CHARACTER_SCREEN):
                 game_state = previous_game_state
@@ -232,6 +258,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         for player_turn_result in player_turn_results:
             message = player_turn_result.get('message')
             dead_entity = player_turn_result.get('dead')
+            fire_weapon = player_turn_result.get('fire_weapon')
             item_added = player_turn_result.get('item_added')
             item_consumed = player_turn_result.get('consumed')
             item_dropped = player_turn_result.get('item_dropped')
@@ -239,6 +266,26 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             targeting = player_turn_result.get('targeting')
             targeting_cancelled = player_turn_result.get('targeting_cancelled')
             xp = player_turn_result.get('xp')
+
+            if fire_weapon:
+                destination_x, destination_y = coordinates
+                target = get_blocking_entities_at_location(entities, destination_x, destination_y)
+                try:
+                    if target == player:
+                        message_log.add_message(
+                            Message('No hitting yourself. Targeting cancelled.', libtcod.yellow))
+                        game_state = previous_game_state
+                    elif target.ai and libtcod.map_is_in_fov(fov_map, target.x, target.y):
+                        attack_results = player.fighter.basic_bow_attack(target)
+                        player_turn_results.extend(attack_results)
+                        game_state = GameStates.ENEMY_TURN
+                    elif target.ai and not libtcod.map_is_in_fov(fov_map, target.x, target.y):
+                        message_log.add_message(
+                            Message('That cannot be targeted. Targeting cancelled.', libtcod.yellow))
+                        game_state = previous_game_state
+                except:
+                    message_log.add_message(Message('That cannot be targeted. Targeting cancelled.', libtcod.yellow))
+                    game_state = previous_game_state
 
             if message:
                 message_log.add_message(message)
@@ -248,8 +295,12 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message, game_state = kill_player(dead_entity)
                 else:
                     message = kill_monster(dead_entity)
-
                 message_log.add_message(message)
+                if config.win == True:
+                    game_state = GameStates.PLAYER_DEAD
+
+            if game_state == GameStates.PLAYER_DEAD:
+                break
 
             if item_added:
                 entities.remove(item_added)
@@ -328,6 +379,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
                     if game_state == GameStates.PLAYER_DEAD:
                         break
+
             else:
                 game_state = GameStates.PLAYERS_TURN
 

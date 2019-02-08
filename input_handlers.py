@@ -65,6 +65,8 @@ def handle_player_turn_keys(key):
         return {'move': (1, 1)}
     elif key_char == '.' or key.vk == libtcod.KEY_KP5:
         return {'wait': True}
+    elif key_char == 'f':
+        return {'aim_weapon': True}
     elif key_char == 'g':
         return {'pickup': True}
     elif key_char == 'i':

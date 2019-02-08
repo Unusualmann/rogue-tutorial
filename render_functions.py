@@ -66,8 +66,7 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
         draw_entity(con, entity, fov_map, game_map)
 
     libtcod.console_set_default_foreground(con, libtcod.white)
-    libtcod.console_print_ex(con, 1, screen_height - 2, libtcod.BKGND_NONE, libtcod.LEFT,
-                             'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp))
+    libtcod.console_print_ex(con, 1, screen_height - 2, libtcod.BKGND_NONE, libtcod.LEFT, 'HP: {0:02}/{1:02}'.format(player.fighter.hp, player.fighter.max_hp))
 
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
     libtcod.console_set_default_background(panel, libtcod.black)
@@ -93,11 +92,11 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, m
 
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         if game_state == GameStates.SHOW_INVENTORY:
-            title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
         else:
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
 
-            inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
+        inventory_menu(con, inventory_title, player, 50, screen_width, screen_height)
     elif game_state == GameStates.LEVEL_UP:
         level_up_menu(con, 'Level up! Choose a stat to raise:', player, 40, screen_width, screen_height)
 

@@ -21,7 +21,24 @@ def heal(*args, **kwargs):
 
     return results
 
-def cast_lightning(*args, **kwargs):
+
+def percent_heal(*args, **kwargs):  # Heal player by a % of max HP.
+    entity = args[0]
+    heal_power = (kwargs.get('amount')/100)  # "Amount" here represents a percent of player max HP
+    # and not a static HP restoration value.
+    amount = round(entity.fighter.max_hp * heal_power)
+
+    results = []
+
+    if entity.fighter.hp == entity.fighter.max_hp:
+        results.append({'consumed': False, 'message': Message("You're fine. Potion not consumed.", libtcod.yellow)})
+    else:
+        entity.fighter.heal(amount)
+        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', libtcod.green)})
+
+    return results
+
+def cast_lightning(*args, **kwargs):  # Somewhat random damage and affected by defense.
     caster = args[0]
     entities = kwargs.get('entities')
     fov_map = kwargs.get('fov_map')
@@ -50,7 +67,7 @@ def cast_lightning(*args, **kwargs):
 
     return results
 
-def cast_fireball(*args, **kwargs):
+def cast_fireball(*args, **kwargs): # Somewhat random damage, AoE, and NOT affected by defense.
     entities = kwargs.get('entities')
     fov_map = kwargs.get('fov_map')
     base_damage = kwargs.get('damage')
